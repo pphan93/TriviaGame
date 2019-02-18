@@ -1,18 +1,42 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Page Title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-    crossorigin="anonymous"></script>
+        crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-    crossorigin="anonymous">
+        crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" media="screen" href="assets/css/style.css">
     <script src="./assets/javascript/app.js"></script>
 </head>
-<body>
-    
+
+<body class="text-center">
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <h1>Trivia Game</h1>
+
+
+        <div class="row status">
+            <div class="statusDiv" id="totalQuestion">1/10</div>
+            <div class="statusDiv" id="questionTimer">30 Seconds</div>
+            <div class="statusDiv" id="correctAnswered">Correct: 0</div>
+        </div>
+
+        <div class="mt-5">
+            <div id="loadQuestion" class="clear">
+            </div>
+
+            <div class="mt-5">
+                <div id="answerOptions" class="clear">
+                </div>
+
+            </div>
+            <div id="image" class="clear"></div>
+
+        </div>
 </body>
+
 </html>
