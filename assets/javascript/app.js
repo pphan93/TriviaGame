@@ -4,30 +4,10 @@ var nextQuestion = 0;
 var totalQuestion;
 var correct = 0;
 var incorrect = 0;
+var unanswered = 0;
+var countdownTimer;
 
-var trivia = {
-    questions: ["Where did Harry Potter go to school?",
-        "What is Darth Vader's real name?"
-        //"Who sang the theme song from Titanic?",
-        //"How do Anna and Elsa know each other in Frozen?",
-        //"Who was the main villain in Avengers: Infinity War?",
-        //"Who directed Inception?",
-        //"What island is Jurassic Park on?",
-        //"What volcano does Frodo Baggins toss the One Ring into?",
-        //"What planet did Luke Skywalker grow up on?",
-        //"What fictional African nation is Black Panther from?"
-    ],
-    answerOptions: [
-        ["Hogwarts", "Neverland", "Mordor", "Dreamland"],
-        ["Anakin Skywalker", "Nat Skywalker", "Cade Skywalker", "Ben Skywalker"]
-    ],
-    //online    : true,
-    correctAnswer: function (position) {
-        return this.answerOptions[position][0];
-    }
-};
-
-var triviaTest = [{
+var trivia = [{
         question: "Where did Harry Potter go to school?",
         answerOptions: ["Hogwarts", "Neverland", "Mordor", "Dreamland"],
         answer: "Hogwarts",
@@ -99,52 +79,52 @@ function shuffleArray(temparr) {
     return temparr;
 }
 
-
-console.log(trivia.correctAnswer(0));
-
-//console.log (shuffleArray(trivia.answerOptions[0]))
-
-
 function loadQuestion() {
 
-    clearScreen();
-    questionCounter();
 
-    $("<h2/>", {
-        text: triviaTest[nextQuestion].question
-    }).appendTo("#loadQuestion");
+    if (nextQuestion < trivia.length) {
+        timer();
+        clearScreen();
+        questionCounter();
+        
 
-    currentAnswer = triviaTest[nextQuestion].answer.split(" ").join("");
+        $("<h2/>", {
+            text: trivia[nextQuestion].question
+        }).appendTo("#loadQuestion");
 
-    var temparray = triviaTest[nextQuestion].answerOptions.slice(0);
-    console.log(temparray);
-    temparray = shuffleArray(temparray);
-    console.log(temparray);
-    for (var i = 0; i < temparray.length; i++) {
-        $("<button/>", {
-            "class": "button",
-            "id": temparray[i].split(" ").join(""),
-            html: temparray[i],
-        }).appendTo("#answerOptions");
-    }
+        currentAnswer = trivia[nextQuestion].answer.split(" ").join("");
 
-    console.log("test");
+        var temparray = trivia[nextQuestion].answerOptions.slice(0);
+        console.log(temparray);
+        temparray = shuffleArray(temparray);
+        console.log(temparray);
+        for (var i = 0; i < temparray.length; i++) {
+            $("<button/>", {
+                "class": "button",
+                "id": temparray[i].split(" ").join(""),
+                html: temparray[i],
+            }).appendTo("#answerOptions");
+        }
+
+        console.log("test");
+        //nextQuestion++;
+    }   
 }
 
 function checkAnswer() {
     if (nextQuestion + 1 < totalQuestion) {
         if (currentAnswer === isAnswerCorrect) {
             console.log("answer Correct");
-            loadImage ();
-            nextQuestion++;
+            //loadImage ();
+            //nextQuestion++;
             correct = correct + 1;
             correctAnswered(correct);
             callLoadQuestion();
 
         } else {
             console.log("answer incorrect");
-            loadImage ();
-            nextQuestion++;
+            //loadImage ();
+            //nextQuestion++;
             incorrect = incorrect + 1;
             incorrectAnswered(incorrect);
             callLoadQuestion();
@@ -152,11 +132,17 @@ function checkAnswer() {
         }
     } else if (nextQuestion + 1 === totalQuestion) {
         if (currentAnswer === isAnswerCorrect) {
-            correctAnswered(correct++);
+            //loadImage ();
+            correct = correct + 1;
+            correctAnswered(correct);
+            callEndGame ();
             console.log("answer Correct : End GAME");
 
         } else {
-            incorrectAnswered(incorrect++);
+            //loadImage ();
+            incorrect = incorrect + 1;
+            incorrectAnswered(incorrect);
+            callEndGame ();
             console.log("answer incorrect : End GAME");
         }
     }
@@ -170,7 +156,37 @@ function clearScreen() {
 function callLoadQuestion () {
     setTimeout(
         function () {
+            nextQuestion++;
             loadQuestion();
+        }, 3000
+    );
+}
+
+function timer () {
+    var timeleft = 30;
+    countdownTimer = setInterval(function () {
+        $("#questionTimer").text(timeleft + " seconds remaining");
+        timeleft -= 1;
+        if (timeleft < 0) {
+            stopTimer ();
+            //incorrect = incorrect + 1;
+            unanswered = unanswered + 1;
+            incorrectAnswered(incorrect);
+            //nextQuestion++;
+            callLoadQuestion();
+        }
+    }, 1000);
+}
+
+function stopTimer() {
+    console.log("stop timer")
+    clearInterval(countdownTimer);
+}
+
+function callEndGame () {
+    setTimeout(
+        function () {
+            endGame();
         }, 3000
     );
 }
@@ -178,7 +194,7 @@ function callLoadQuestion () {
 function loadImage () {
     $("<img/>", {
         "class": "img-fluid",
-        src: triviaTest[nextQuestion].picture
+        src: trivia[nextQuestion].picture
     }).appendTo("#image");
 }
 
@@ -187,6 +203,7 @@ function questionCounter() {
 }
 
 function correctAnswered(correct) {
+    loadImage ();
     var correctInput = $("#" + isAnswerCorrect);
     correctInput.addClass("correct");
     correctInput.html("&#10003; " + correctInput.text());
@@ -195,6 +212,7 @@ function correctAnswered(correct) {
 }
 
 function incorrectAnswered(incorrect) {
+    loadImage ();
     var incorrectInput = $("#" + isAnswerCorrect);
     var correct = $("#" + currentAnswer);
 
@@ -208,24 +226,21 @@ function incorrectAnswered(incorrect) {
     incorrectInput.html("&#10007; " + incorrectInput.text());
 }
 
+function endGame () {
+    clearScreen();
+    $("<h4/>").text("Correct: " + correct).appendTo("#score");
+    $("<h4/>").text("Incorrect: " + incorrect).appendTo("#score");
+    $("<h4/>").text("Unanswred: " + unanswered).appendTo("#score");
 
-//temparray = trivia.answerOptions[0].slice(0);
-//console.log(temparray);
-//temparray = shuffle(temparray);
-//shuffleArray(temparray);
-//console.log(temparray);
-//console.log (temparr);
-
-//console.log (trivia.answerOptions[0]);
-console.log(triviaTest[0].answer);
-
+}
 
 $(document).ready(function () {
-    totalQuestion = triviaTest.length;
-    shuffleArray(triviaTest);
+    totalQuestion = trivia.length;
+    shuffleArray(trivia);
     loadQuestion();
 
     $(document).on("click", ".button", function () {
+        stopTimer ();
         isAnswerCorrect = this.id;
         console.log(isAnswerCorrect);
         checkAnswer();
