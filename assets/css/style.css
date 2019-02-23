@@ -81,3 +81,9 @@ h1 {
 .statusDiv {
     flex: 1;
 }
+
+#start {
+    padding-left: 40px;
+    padding-right: 40px;
+    
+}
