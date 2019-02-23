@@ -6,6 +6,7 @@ var correct = 0;
 var incorrect = 0;
 var unanswered = 0;
 var countdownTimer;
+var next = true;
 
 var trivia = [{
         question: "Where did Harry Potter go to school?",
@@ -80,8 +81,6 @@ function shuffleArray(temparr) {
 }
 
 function loadQuestion() {
-
-
     if (nextQuestion < trivia.length) {
         timer();
         clearScreen();
@@ -93,11 +92,8 @@ function loadQuestion() {
         }).appendTo("#loadQuestion");
 
         currentAnswer = trivia[nextQuestion].answer.split(" ").join("");
-
         var temparray = trivia[nextQuestion].answerOptions.slice(0);
-        console.log(temparray);
         temparray = shuffleArray(temparray);
-        console.log(temparray);
         for (var i = 0; i < temparray.length; i++) {
             $("<button/>", {
                 "class": "button",
@@ -105,47 +101,24 @@ function loadQuestion() {
                 html: temparray[i],
             }).appendTo("#answerOptions");
         }
-
-        console.log("test");
-        //nextQuestion++;
+        next = true;
     }   
 }
 
 function checkAnswer() {
-    if (nextQuestion + 1 < totalQuestion) {
         if (currentAnswer === isAnswerCorrect) {
             console.log("answer Correct");
-            //loadImage ();
-            //nextQuestion++;
             correct = correct + 1;
             correctAnswered(correct);
             callLoadQuestion();
 
         } else {
             console.log("answer incorrect");
-            //loadImage ();
-            //nextQuestion++;
             incorrect = incorrect + 1;
-            incorrectAnswered(incorrect);
+            incorrectAnswered();
             callLoadQuestion();
 
         }
-    } else if (nextQuestion + 1 === totalQuestion) {
-        if (currentAnswer === isAnswerCorrect) {
-            //loadImage ();
-            correct = correct + 1;
-            correctAnswered(correct);
-            callEndGame ();
-            console.log("answer Correct : End GAME");
-
-        } else {
-            //loadImage ();
-            incorrect = incorrect + 1;
-            incorrectAnswered(incorrect);
-            callEndGame ();
-            console.log("answer incorrect : End GAME");
-        }
-    }
 }
 
 function clearScreen() {
@@ -156,8 +129,14 @@ function clearScreen() {
 function callLoadQuestion () {
     setTimeout(
         function () {
-            nextQuestion++;
-            loadQuestion();
+
+            if (nextQuestion + 1 === totalQuestion) {
+                callEndGame ();
+            }
+            else {
+                nextQuestion++;
+                loadQuestion();
+            }
         }, 3000
     );
 }
@@ -169,17 +148,15 @@ function timer () {
         timeleft -= 1;
         if (timeleft < 0) {
             stopTimer ();
-            //incorrect = incorrect + 1;
             unanswered = unanswered + 1;
-            incorrectAnswered(incorrect);
-            //nextQuestion++;
+            incorrectAnswered();
             callLoadQuestion();
         }
     }, 1000);
 }
 
 function stopTimer() {
-    console.log("stop timer")
+    console.log("stop timer");
     clearInterval(countdownTimer);
 }
 
@@ -207,11 +184,10 @@ function correctAnswered(correct) {
     var correctInput = $("#" + isAnswerCorrect);
     correctInput.addClass("correct");
     correctInput.html("&#10003; " + correctInput.text());
-    console.log("correctAASAS: " + correct);
     $("#correctAnswered").text("Correct: " + correct);
 }
 
-function incorrectAnswered(incorrect) {
+function incorrectAnswered() {
     loadImage ();
     var incorrectInput = $("#" + isAnswerCorrect);
     var correct = $("#" + currentAnswer);
@@ -219,9 +195,6 @@ function incorrectAnswered(incorrect) {
 
     correct.addClass("correct");
     correct.html("&#10003; " + correct.text());
-    console.log("incoorectAASAS: " + incorrect);
-    //$("#correctAnswered").text("Correct: " + incorrect);
-
     incorrectInput.addClass("incorrect");
     incorrectInput.html("&#10007; " + incorrectInput.text());
 }
@@ -230,19 +203,49 @@ function endGame () {
     clearScreen();
     $("<h4/>").text("Correct: " + correct).appendTo("#score");
     $("<h4/>").text("Incorrect: " + incorrect).appendTo("#score");
-    $("<h4/>").text("Unanswred: " + unanswered).appendTo("#score");
+    $("<h4/>").text("Unanswered: " + unanswered).appendTo("#score");
+    $("<button>", {
+        "id" : "start",
+        "type": "button",
+        "class" : "btn btn-light",
+        text: "RESET"
+    }).appendTo("#score");
+
+}
+
+function startGame () {
+    nextQuestion = 0;
+    correct = 0;
+    incorrect = 0;
+    unanswered = 0;
+    
+    $("#correctAnswered").text("Correct: 0");
+
+    shuffleArray(trivia);
+    loadQuestion();
 
 }
 
 $(document).ready(function () {
     totalQuestion = trivia.length;
-    shuffleArray(trivia);
-    loadQuestion();
+
+    $("<button>", {
+        "id" : "start",
+        "type": "button",
+        "class" : "btn btn-primary btn-lg",
+        text: "Start"
+    }).appendTo("#score");
 
     $(document).on("click", ".button", function () {
-        stopTimer ();
-        isAnswerCorrect = this.id;
-        console.log(isAnswerCorrect);
-        checkAnswer();
+        if (next) {
+            next = false;
+            stopTimer ();
+            isAnswerCorrect = this.id;
+            checkAnswer();
+        }
+    });
+
+    $(document).on("click", "#start", function () {
+        startGame ();
     });
 });
